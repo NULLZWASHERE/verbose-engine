@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGS Data Center - Secure Video Stream</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .player-container {
+            position: relative;
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #000;
+        }
+
+        /* Single Jumping Watermark */
+        .watermark {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.85);
+            pointer-events: none;
+            z-index: 50;
+            user-select: none;
+            white-space: nowrap;
+            transition: all 0.6s ease-in-out;
+        }
+        
+        /* Subtle repeating pattern */
+        .watermark-repeated {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                135deg,
+                transparent,
+                transparent 380px,
+                rgba(255, 255, 255, 0.04) 380px,
+                rgba(255, 255, 255, 0.04) 480px
+            );
+            pointer-events: none;
+            z-index: 40;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 60;
+            pointer-events: none;
+        }
+        
+        .title {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 80;
+            font-size: 22px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.92);
+            padding: 20px 35px;
+            border-radius: 8px;
+            z-index: 100;
+            display: none;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <div class="title">AGS Data Center • Secure Stream</div>
+        
+        <video id="videoPlayer" controls controlsList="nodownload" disablePictureInPicture>
+            <source src="https://storage.filebin.net/filebin/ec66b1cec180f81e3487acebd0010e8a866c8003b02e191877e60a570f770737?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=GK352fd2505074fc9dde7fd2cb%2F20260521%2Fhel1-dc4%2Fs3%2Faws4_request&X-Amz-Date=20260521T043019Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&response-cache-control=max-age%3D900&response-content-disposition=inline%3B%20filename%3D%22DC-TLA_-_Brazil_Accessibility_Reference_Render_REF.mp4%22&response-content-type=video%2Fmp4&x-id=GetObject&X-Amz-Signature=215f63befd748781563147e6b4bc5338d0751607aa0053b516754f30b16ea5fd" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        
+        <!-- Single Random Position Watermark -->
+        <div class="watermark" id="watermark">discord.gg/gZhstsGCgg</div>
+        
+        <div class="watermark-repeated"></div>
+        <div class="overlay" id="overlay"></div>
+        
+        <div class="message" id="message">
+            Downloading is strictly prohibited.<br>
+            © AGS Data Center
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const watermark = document.getElementById('watermark');
+        const message = document.getElementById('message');
+
+        // Random position function
+        function moveWatermark() {
+            const container = video.parentElement;
+            const maxX = container.offsetWidth - 420;   // prevent text from going off screen
+            const maxY = container.offsetHeight - 80;
+            
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+            
+            watermark.style.left = randomX + "px";
+            watermark.style.top = randomY + "px";
+        }
+
+        // Move watermark every 10 seconds
+        setInterval(moveWatermark, 1000);
+        
+        // Initial position
+        window.addEventListener('load', () => {
+            moveWatermark();
+        });
+
+        // Prevent right-click
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('video')) {
+                e.preventDefault();
+                showMessage();
+                return false;
+            }
+        });
+        
+        function showMessage() {
+            message.style.display = 'block';
+            setTimeout(() => { message.style.display = 'none'; }, 2200);
+        }
+        
+        // Block Ctrl/Cmd + S
+        document.addEventListener('keydown', function(e) {
+            if (e.key.toLowerCase() === 's' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                showMessage();
+            }
+        });
+        
+        video.addEventListener('dragstart', e => e.preventDefault());
+        
+        console.log('%cAGS Data Center - Video Protected', 'color: #00ffcc; font-size: 14px;');
+    </script>
+</body>
+</html>
